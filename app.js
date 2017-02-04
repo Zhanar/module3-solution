@@ -32,6 +32,9 @@ function NarrowItDownController(MenuSearchService) {
       if(menu.searchTerm === undefined || menu.items.length === 0) {
         menu.notFound = true;
       }
+      else {
+        menu.notFound = false;
+      }
     });
   };
 
