@@ -28,33 +28,34 @@ function NarrowItDownController(MenuSearchService) {
   menu.search = function() {
 
     MenuSearchService.getMatchedMenuItems(menu.searchTerm).then(function(result) {
-      menu.items = result;
-      if(menu.searchTerm === undefined || menu.items.length === 0) {
+      menu.items = [];
+      if(menu.searchTerm === undefined || menu.searchTerm === "" || result.length === 0) {
         menu.notFound = true;
+        menu.items = [];
       }
       else {
         menu.notFound = false;
+        menu.items = result;
       }
     });
   };
 
   menu.removeItem = function(itemIndex) {
-    MenuSearchService.removeItem(itemIndex);
+    MenuSearchService.removeItem(itemIndex, menu.items);
   };
 }
 
 MenuSearchService.$inject = ['$http', 'ApiBasePath'];
 function MenuSearchService($http, ApiBasePath) {
   var service = this;
-  var foundItems = [];
-
+  
   service.getMatchedMenuItems = function(searchTerm){
 
     return $http({
         method: "GET",
         url: (ApiBasePath + "/menu_items.json")
       }).then(function (result) {
-
+        var foundItems = [];
       // process result and only keep items that match
       for (var i = 0; i < result.data.menu_items.length; i++) {
         if(result.data.menu_items[i].description.indexOf(searchTerm) !== -1) {
@@ -65,7 +66,7 @@ function MenuSearchService($http, ApiBasePath) {
       return foundItems;
     });
   };
-  service.removeItem = function (itemIndex) {
+  service.removeItem = function (itemIndex, foundItems) {
     foundItems.splice(itemIndex, 1);
   };
 }
